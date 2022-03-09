@@ -78,7 +78,7 @@ Resources:
     Properties:
       Parameters:
         CidrBlock: !Sub '10.${ClassB}.0.0/16'
-      TemplateURL: './node_modules/@cfn-modules/vpc-plain/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-plain/module.yml'
   SubnetAPublic:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
@@ -89,7 +89,7 @@ Resources:
         AZChar: A
         SubnetIndex: '0'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
-      TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-subnet/module.yml'
   SubnetAPrivate:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
@@ -100,7 +100,7 @@ Resources:
         AZChar: A
         SubnetIndex: '1'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
-      TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-subnet/module.yml'
   NatGatewayA:
     Condition: HasNatGateways
     Type: 'AWS::CloudFormation::Stack'
@@ -109,7 +109,7 @@ Resources:
         PublicSubnetModule: !GetAtt 'SubnetAPublic.Outputs.StackName'
         PrivateSubnetModule: !GetAtt 'SubnetAPrivate.Outputs.StackName'
         AlertingModule: !Ref AlertingModule
-      TemplateURL: './node_modules/@cfn-modules/vpc-nat-gateway/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-nat-gateway/module.yml'
   SubnetBPublic:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
@@ -120,7 +120,7 @@ Resources:
         AZChar: B
         SubnetIndex: '2'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
-      TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-subnet/module.yml'
   SubnetBPrivate:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
@@ -131,7 +131,7 @@ Resources:
         AZChar: B
         SubnetIndex: '3'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
-      TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-subnet/module.yml'
   NatGatewayB:
     Condition: HasNatGateways
     Type: 'AWS::CloudFormation::Stack'
@@ -140,7 +140,7 @@ Resources:
         PublicSubnetModule: !GetAtt 'SubnetBPublic.Outputs.StackName'
         PrivateSubnetModule: !GetAtt 'SubnetBPrivate.Outputs.StackName'
         AlertingModule: !Ref AlertingModule
-      TemplateURL: './node_modules/@cfn-modules/vpc-nat-gateway/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-nat-gateway/module.yml'
   SubnetCPublic:
     Condition: HasAvailabilityZoneC
     Type: 'AWS::CloudFormation::Stack'
@@ -152,7 +152,7 @@ Resources:
         AZChar: C
         SubnetIndex: '4'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
-      TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-subnet/module.yml'
   SubnetCPrivate:
     Condition: HasAvailabilityZoneC
     Type: 'AWS::CloudFormation::Stack'
@@ -164,7 +164,7 @@ Resources:
         AZChar: C
         SubnetIndex: '5'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
-      TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-subnet/module.yml'
   NatGatewayC:
     Condition: HasAvailabilityZoneCAndNatGateways
     Type: 'AWS::CloudFormation::Stack'
@@ -173,7 +173,7 @@ Resources:
         PublicSubnetModule: !GetAtt 'SubnetCPublic.Outputs.StackName'
         PrivateSubnetModule: !GetAtt 'SubnetCPrivate.Outputs.StackName'
         AlertingModule: !Ref AlertingModule
-      TemplateURL: './node_modules/@cfn-modules/vpc-nat-gateway/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-nat-gateway/module.yml'
   VPCEndpointS3:
     Condition: HasS3Endpoint
     Type: 'AWS::EC2::VPCEndpoint'
@@ -237,7 +237,7 @@ Resources:
         VpcPlainModule: !GetAtt 'VpcPlain.Outputs.StackName'
         TrafficType: !If [HasFlowLogRejectOnly, REJECT, ALL]
         RetentionInDays: !Ref FlowLogRetentionInDays
-      TemplateURL: './node_modules/@cfn-modules/vpc-flow-log/module.yml'
+      TemplateURL: '../../../node_modules/@cfn-modules/vpc-flow-log/module.yml'
 Outputs:
   ModuleId:
     Value: 'vpc'
