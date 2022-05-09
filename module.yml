@@ -43,6 +43,11 @@ Parameters:
     Type: String
     Default: false
     AllowedValues: [true, false]
+  LambdaEndpoint:
+    Description: 'Add Lambda endpoint to VPC?'
+    Type: String
+    Default: false
+    AllowedValues: [true, false]
   DynamoDBEndpoint:
     Description: 'Add DynamoDB endpoint to VPC?'
     Type: String
@@ -67,6 +72,7 @@ Conditions:
   HasAvailabilityZoneC: !Equals [!Ref NumberOfAvailabilityZones, 3]
   HasS3Endpoint: !Equals [!Ref S3Endpoint, true]
   HasXRayEndpoint: !Equals [!Ref XRayEndpoint, true]
+  HasLambdaEndpoint: !Equals [!Ref LambdaEndpoint, true]
   HasDynamoDBEndpoint: !Equals [!Ref DynamoDBEndpoint, true]
   HasFlowLog: !Not [!Equals [!Ref FlowLog, false]]
   HasFlowLogRejectOnly: !Equals [!Ref FlowLog, 'reject-only']
@@ -209,6 +215,35 @@ Resources:
       PrivateDnsEnabled: true
       SecurityGroupIds:
         - !Ref XRaySecurityGroup
+      SubnetIds: !If
+        - HasAvailabilityZoneC
+        - - !GetAtt 'SubnetAPrivate.Outputs.Id'
+          - !GetAtt 'SubnetBPrivate.Outputs.Id'
+          - !GetAtt 'SubnetCPrivate.Outputs.Id'
+        - - !GetAtt 'SubnetAPrivate.Outputs.Id'
+          - !GetAtt 'SubnetBPrivate.Outputs.Id'
+  LambdaSecurityGroup:
+    Condition: HasLambdaEndpoint
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub '${AWS::StackName}-Lambda'
+      VpcId: !GetAtt 'VpcPlain.Outputs.Id'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Sub '10.${ClassB}.0.0/16'
+          Description: 'Allow everything in VPC to access private Lambda endpoint'
+  VPCEndpointLambda:
+    Condition: HasLambdaEndpoint
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.lambda'
+      VpcId: !GetAtt 'VpcPlain.Outputs.Id'
+      VpcEndpointType: 'Interface'
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref LambdaSecurityGroup
       SubnetIds: !If
         - HasAvailabilityZoneC
         - - !GetAtt 'SubnetAPrivate.Outputs.Id'

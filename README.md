@@ -26,6 +26,7 @@ Resources:
         NumberOfAvailabilityZones: 3 # optional
         S3Endpoint: true # optional
         XRayEndpoint: false # optional
+        LambdaEndpoint: false # optional
         DynamoDBEndpoint: true # optional
         FlowLog: 'reject-only' # optional
         FlowLogRetentionInDays: 14 # optional
@@ -142,6 +143,13 @@ This will mean you can refer to the `VpcModule` in other configurations.
     <tr>
       <td>XRayEndpoint</td>
       <td>Add <a href="https://docs.aws.amazon.com/xray/latest/devguide/xray-security-vpc-endpoint.html">X-Ray endpoint</a> to VPC?</td>
+      <td>false</td>
+      <td>no</td>
+      <td>[true, false]</td>
+    </tr>
+    <tr>
+      <td>LambdaEndpoint</td>
+      <td>Add <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc-endpoints.html">Lambda endpoint</a> to VPC?</td>
       <td>false</td>
       <td>no</td>
       <td>[true, false]</td>
