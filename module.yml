@@ -48,6 +48,16 @@ Parameters:
     Type: String
     Default: false
     AllowedValues: [true, false]
+  SesEndpoint:	
+    Description: 'Add SES endpoint to VPC?'	
+    Type: String	
+    Default: false	
+    AllowedValues: [true, false]	
+  SecretsManagerEndpoint:	
+    Description: 'Add SecretsManager endpoint to VPC?'	
+    Type: String	
+    Default: false	
+    AllowedValues: [true, false]
   DynamoDBEndpoint:
     Description: 'Add DynamoDB endpoint to VPC?'
     Type: String
@@ -73,6 +83,8 @@ Conditions:
   HasS3Endpoint: !Equals [!Ref S3Endpoint, true]
   HasXRayEndpoint: !Equals [!Ref XRayEndpoint, true]
   HasLambdaEndpoint: !Equals [!Ref LambdaEndpoint, true]
+  HasSesEndpoint: !Equals [!Ref SesEndpoint, true]	
+  HasSecretsManagerEndpoint: !Equals [!Ref SecretsManagerEndpoint, true]
   HasDynamoDBEndpoint: !Equals [!Ref DynamoDBEndpoint, true]
   HasFlowLog: !Not [!Equals [!Ref FlowLog, false]]
   HasFlowLogRejectOnly: !Equals [!Ref FlowLog, 'reject-only']
@@ -244,6 +256,64 @@ Resources:
       PrivateDnsEnabled: true
       SecurityGroupIds:
         - !Ref LambdaSecurityGroup
+      SubnetIds: !If
+        - HasAvailabilityZoneC
+        - - !GetAtt 'SubnetAPrivate.Outputs.Id'
+          - !GetAtt 'SubnetBPrivate.Outputs.Id'
+          - !GetAtt 'SubnetCPrivate.Outputs.Id'
+        - - !GetAtt 'SubnetAPrivate.Outputs.Id'
+          - !GetAtt 'SubnetBPrivate.Outputs.Id'
+  SesSecurityGroup:
+    Condition: HasSesEndpoint
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub '${AWS::StackName}-SES'
+      VpcId: !GetAtt 'VpcPlain.Outputs.Id'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 587
+          ToPort: 587
+          CidrIp: !Sub '10.${ClassB}.0.0/16'
+          Description: 'Allow everything in VPC to access SES'
+  VPCEndpointSES:
+    Condition: HasSesEndpoint
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.email-smtp'
+      VpcId: !GetAtt 'VpcPlain.Outputs.Id'
+      VpcEndpointType: 'Interface'
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref SesSecurityGroup
+      SubnetIds: !If
+        - HasAvailabilityZoneC
+        - - !GetAtt 'SubnetAPrivate.Outputs.Id'
+          - !GetAtt 'SubnetBPrivate.Outputs.Id'
+          - !GetAtt 'SubnetCPrivate.Outputs.Id'
+        - - !GetAtt 'SubnetAPrivate.Outputs.Id'
+          - !GetAtt 'SubnetBPrivate.Outputs.Id'
+  SecretsManagerSecurityGroup:
+    Condition: HasSecretsManagerEndpoint
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub '${AWS::StackName}-SecretsManager'
+      VpcId: !GetAtt 'VpcPlain.Outputs.Id'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Sub '10.${ClassB}.0.0/16'
+          Description: 'Allow everything in VPC to access SecretsManager'
+  VPCEndpointSecretsManager:
+    Condition: HasSecretsManagerEndpoint
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.secretsmanager'
+      VpcId: !GetAtt 'VpcPlain.Outputs.Id'
+      VpcEndpointType: 'Interface'
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref SecretsManagerSecurityGroup
       SubnetIds: !If
         - HasAvailabilityZoneC
         - - !GetAtt 'SubnetAPrivate.Outputs.Id'
