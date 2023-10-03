@@ -48,15 +48,15 @@ Parameters:
     Type: String
     Default: false
     AllowedValues: [true, false]
-  SesEndpoint:	
-    Description: 'Add SES endpoint to VPC?'	
-    Type: String	
-    Default: false	
-    AllowedValues: [true, false]	
-  SecretsManagerEndpoint:	
-    Description: 'Add SecretsManager endpoint to VPC?'	
-    Type: String	
-    Default: false	
+  SesEndpoint:
+    Description: 'Add SES endpoint to VPC?'
+    Type: String
+    Default: false
+    AllowedValues: [true, false]
+  SecretsManagerEndpoint:
+    Description: 'Add SecretsManager endpoint to VPC?'
+    Type: String
+    Default: false
     AllowedValues: [true, false]
   DynamoDBEndpoint:
     Description: 'Add DynamoDB endpoint to VPC?'
@@ -83,7 +83,7 @@ Conditions:
   HasS3Endpoint: !Equals [!Ref S3Endpoint, true]
   HasXRayEndpoint: !Equals [!Ref XRayEndpoint, true]
   HasLambdaEndpoint: !Equals [!Ref LambdaEndpoint, true]
-  HasSesEndpoint: !Equals [!Ref SesEndpoint, true]	
+  HasSesEndpoint: !Equals [!Ref SesEndpoint, true]
   HasSecretsManagerEndpoint: !Equals [!Ref SecretsManagerEndpoint, true]
   HasDynamoDBEndpoint: !Equals [!Ref DynamoDBEndpoint, true]
   HasFlowLog: !Not [!Equals [!Ref FlowLog, false]]
