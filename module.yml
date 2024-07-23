@@ -68,6 +68,12 @@ Parameters:
     Type: String
     Default: true
     AllowedValues: [true, false]
+  Environment:
+    Description: 'The environment to deploy to (e.g. dev, prod, ...)'
+    Type: String
+  CIDR:
+    Description: 'CIDR block of the VPC'
+    Type: String
 Conditions:
   HasAvailabilityZoneC: !Equals [!Ref NumberOfAvailabilityZones, 3]
   HasS3Endpoint: !Equals [!Ref S3Endpoint, true]
@@ -83,7 +89,7 @@ Resources:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
       Parameters:
-        CidrBlock: !Sub '10.${ClassB}.0.0/16'
+        CidrBlock: !Ref CIDR
       TemplateURL: './node_modules/@cfn-modules/vpc-plain/module.yml'
   SubnetAPublic:
     Type: 'AWS::CloudFormation::Stack'
@@ -95,6 +101,7 @@ Resources:
         AZChar: A
         SubnetIndex: '0'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
+        Environment: !Ref Environment
       TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
   SubnetAPrivate:
     Type: 'AWS::CloudFormation::Stack'
@@ -106,6 +113,7 @@ Resources:
         AZChar: A
         SubnetIndex: '1'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
+        Environment: !Ref Environment
       TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
   NatGatewayA:
     Condition: HasNatGateways
@@ -126,6 +134,7 @@ Resources:
         AZChar: B
         SubnetIndex: '2'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
+        Environment: !Ref Environment
       TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
   SubnetBPrivate:
     Type: 'AWS::CloudFormation::Stack'
@@ -137,6 +146,7 @@ Resources:
         AZChar: B
         SubnetIndex: '3'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
+        Environment: !Ref Environment
       TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
   NatGatewayB:
     Condition: HasNatGateways
@@ -158,6 +168,7 @@ Resources:
         AZChar: C
         SubnetIndex: '4'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
+        Environment: !Ref Environment
       TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
   SubnetCPrivate:
     Condition: HasAvailabilityZoneC
@@ -170,6 +181,7 @@ Resources:
         AZChar: C
         SubnetIndex: '5'
         SubnetCount: !If [HasAvailabilityZoneC, 6, 4]
+        Environment: !Ref Environment
       TemplateURL: './node_modules/@cfn-modules/vpc-subnet/module.yml'
   NatGatewayC:
     Condition: HasAvailabilityZoneCAndNatGateways
@@ -203,7 +215,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: !Sub '10.${ClassB}.0.0/16'
+          CidrIp: !Ref CIDR
           Description: 'Allow everything in VPC to access private X-Ray endpoint'
   VPCEndpointXRay:
     Condition: HasXRayEndpoint
@@ -232,7 +244,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: !Sub '10.${ClassB}.0.0/16'
+          CidrIp: !Ref CIDR
           Description: 'Allow everything in VPC to access private Lambda endpoint'
   VPCEndpointLambda:
     Condition: HasLambdaEndpoint
@@ -285,7 +297,7 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-Id'
   CidrBlock:
-    Value: !Sub '10.${ClassB}.0.0/16'
+    Value: !Ref CIDR
     Export:
       Name: !Sub '${AWS::StackName}-CidrBlock'
   NumberOfAvailabilityZones:

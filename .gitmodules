@@ -4,9 +4,9 @@
 [submodule "node_modules/@cfn-modules/vpc-flow-log"]
 	path = node_modules/@cfn-modules/vpc-flow-log
 	url = https://github.com/cfn-modules/vpc-flow-log
-[submodule "node_modules/@cfn-modules/vpc-subnet"]
-	path = node_modules/@cfn-modules/vpc-subnet
-	url = https://github.com/cfn-modules/vpc-subnet
 [submodule "node_modules/@cfn-modules/vpc-plain"]
 	path = node_modules/@cfn-modules/vpc-plain
-	url = https://github.com/cfn-modules/vpc-plain
+	url = https://github.com/experoinc/vpc-plain.git
+[submodule "node_modules/@cfn-modules/vpc-subnet"]
+	path = node_modules/@cfn-modules/vpc-subnet
+	url = https://github.com/experoinc/vpc-subnet.git
